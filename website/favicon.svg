@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs><linearGradient id="orbit" x1="100" y1="100" x2="420" y2="410" gradientUnits="userSpaceOnUse"><stop stop-color="#4657E8"/><stop offset=".5" stop-color="#3478ED"/><stop offset="1" stop-color="#10AAA9"/></linearGradient></defs>
+  <g stroke="url(#orbit)" stroke-width="24" stroke-linecap="round"><path d="M313.30 89.59A176 176 0 0 1 428.77 289.58"/><path d="M371.47 388.83A176 176 0 0 1 140.53 388.83"/><path d="M83.23 289.58A176 176 0 0 1 198.70 89.59"/></g>
+  <rect x="228" y="52" width="56" height="56" rx="18" fill="#4657E8"/><rect x="380.42" y="316" width="56" height="56" rx="18" fill="#10AAA9"/><rect x="75.58" y="316" width="56" height="56" rx="18" fill="#3478ED"/>
+  <path d="M192 188H320C331.05 188 340 196.95 340 208C340 219.05 331.05 228 320 228H284C279.58 228 276 231.58 276 236V308C276 319.05 267.05 328 256 328C244.95 328 236 319.05 236 308V236C236 231.58 232.42 228 228 228H192C180.95 228 172 219.05 172 208C172 196.95 180.95 188 192 188Z" fill="#4657E8"/>
+</svg>

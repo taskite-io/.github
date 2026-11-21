@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#4657e8">
+  <meta name="description" content="Taskite 分布式任务调度引擎。以 Multi-Raft 复制、持久化任务状态、独立分区和 Worker 租约，让普通任务与定时任务可靠执行。">
+  <meta property="og:title" content="Taskite — 分布式任务，可靠执行。">
+  <meta property="og:description" content="探索 Taskite 的分布式架构、持久化执行与故障恢复。">
+  <meta property="og:type" content="website">
+  <meta name="color-scheme" content="light dark">
+  <title>Taskite — 分布式任务，可靠执行。</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css?v=13">
+  <script src="./app.js?v=14" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳转到内容</a>
+  <svg class="svg-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <linearGradient id="brand-orbit" x1="100" y1="100" x2="420" y2="410" gradientUnits="userSpaceOnUse"><stop stop-color="#4657e8"/><stop offset=".5" stop-color="#3478ed"/><stop offset="1" stop-color="#10aaa9"/></linearGradient>
+      <linearGradient id="brand-letter" x1="182" y1="188" x2="300" y2="328" gradientUnits="userSpaceOnUse"><stop stop-color="#4657e8"/><stop offset="1" stop-color="#3478ed"/></linearGradient>
+      <symbol id="taskite-mark" viewBox="0 0 512 512">
+        <g fill="none" stroke="url(#brand-orbit)" stroke-width="24" stroke-linecap="round"><path d="M313.30 89.59A176 176 0 0 1 428.77 289.58"/><path d="M371.47 388.83A176 176 0 0 1 140.53 388.83"/><path d="M83.23 289.58A176 176 0 0 1 198.70 89.59"/></g>
+        <rect x="228" y="52" width="56" height="56" rx="18" fill="#4657e8"/><rect x="380.42" y="316" width="56" height="56" rx="18" fill="#10aaa9"/><rect x="75.58" y="316" width="56" height="56" rx="18" fill="#3478ed"/>
+        <path d="M192 188H320C331.05 188 340 196.95 340 208C340 219.05 331.05 228 320 228H284C279.58 228 276 231.58 276 236V308C276 319.05 267.05 328 256 328C244.95 328 236 319.05 236 308V236C236 231.58 232.42 228 228 228H192C180.95 228 172 219.05 172 208C172 196.95 180.95 188 192 188Z" fill="url(#brand-letter)"/>
+      </symbol>
+      <symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="network-gateway" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="7" height="7" rx="2"/><path d="M12 3v5.5M3 12h5.5M15.5 12H21M12 15.5V21m-2-16 2-2 2 2m5 5 2 2-2 2m-9 5 2 2 2-2"/></symbol>
+      <symbol id="network-broker" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="7" rx="2"/><rect x="3" y="14" width="18" height="7" rx="2"/><path d="M7 6.5h.01M7 17.5h.01M12 6.5h5m-5 11h5M12 10v4"/></symbol>
+      <symbol id="network-worker" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="m9 8-4 4 4 4m6-8 4 4-4 4m-4 2 2-12"/></symbol>
+      <symbol id="network-pd" viewBox="0 0 24 24"><circle cx="12" cy="5" r="3"/><circle cx="5" cy="19" r="3"/><circle cx="19" cy="19" r="3"/><path d="M12 8v4m-7 4v-4h14v4"/></symbol>
+      <symbol id="task-record" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="4"/><path d="M8 8h8m-8 4h8m-8 4h4"/></symbol>
+      <symbol id="task-check" viewBox="0 0 24 24"><path d="m5 12 4.5 4.5L19 7"/></symbol>
+      <symbol id="github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.86c-2.78.6-3.37-1.18-3.37-1.18-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.64-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02A9.55 9.55 0 0 1 12 6.82c.85 0 1.71.11 2.51.34 1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.94.36.31.68.92.68 1.85v2.75c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/></symbol>
+    </defs>
+  </svg>
+
+  <header class="site-header">
+    <nav class="nav wrap" aria-label="主导航">
+      <a class="wordmark" href="#top" aria-label="Taskite 首页"><svg aria-hidden="true"><use href="#taskite-mark"/></svg><span>Taskite<span class="wordmark-dot">.</span></span></a>
+      <div class="nav-links"><a href="#architecture">系统架构</a><a href="#reliability">可靠执行</a><a href="#developers">开发者</a></div>
+      <div class="nav-actions">
+        <button id="motion-toggle" class="motion-toggle" type="button" aria-pressed="false" aria-label="暂停动态效果"><span class="pause-symbol" aria-hidden="true"></span><span class="motion-label">暂停动效</span></button>
+        <a class="nav-github" href="https://github.com/taskite-io/taskite" aria-label="查看 Taskite GitHub 仓库"><svg aria-hidden="true"><use href="#github"/></svg><span>GitHub</span><span aria-hidden="true">↗</span></a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section id="top" class="hero wrap">
+      <div class="hero-copy">
+        <a class="release-pill" href="https://github.com/taskite-io/taskite"><span class="status-dot" aria-hidden="true"></span>正在构建下一程 <span class="mono">0.1.0-SNAPSHOT</span><span aria-hidden="true">↗</span></a>
+        <p class="eyebrow">DISTRIBUTED TASK SCHEDULING ENGINE</p>
+        <h1>分布式任务。<br><span>可靠执行。</span></h1>
+        <p class="hero-english">Distributed tasks. Reliable execution.</p>
+        <p class="hero-description">从一次任务，到持续运转的业务。<br>让任务状态持久保存，让负载分散到集群，<br class="desktop-break">让执行在故障之后继续。</p>
+        <div class="hero-actions"><a class="button primary" href="#developers">开始构建<svg aria-hidden="true"><use href="#arrow"/></svg></a><a class="button text-button" href="#architecture">探索系统架构<span aria-hidden="true">↓</span></a></div>
+        <p class="hero-note">普通任务与定时任务 <span aria-hidden="true">·</span> Multi-Raft <span aria-hidden="true">·</span> gRPC</p>
+      </div>
+      <div class="hero-art">
+        <div class="art-topline"><span>四个角色，一个可靠的引擎。</span><span class="art-key"><i aria-hidden="true"></i>持续协作</span></div>
+        <div class="product-orbit" role="img" aria-labelledby="orbit-title orbit-desc">
+          <span id="orbit-title" class="visually-hidden">Taskite 分布式任务轨道</span>
+          <span id="orbit-desc" class="visually-hidden">PD 协调集群，Gateway 接入与路由，Broker 保存与复制状态，Worker 执行与上报。四个组件用同规格的单个图标围绕 Taskite 标识协作，名称与职责位于轨道外侧。轨道表示持续协作，各组件都可部署多个实例；具体通信关系见下方架构演示。</span>
+          <svg class="orbit-illustration" viewBox="0 0 640 530" preserveAspectRatio="none" aria-hidden="true">
+            <defs><linearGradient id="product-orbit-color" x1="114" y1="88" x2="526" y2="432" gradientUnits="userSpaceOnUse"><stop stop-color="#4657e8"/><stop offset=".52" stop-color="#3478ed"/><stop offset="1" stop-color="#10aaa9"/></linearGradient></defs>
+            <ellipse class="orbit-guide" cx="320" cy="260" rx="160" ry="152"/>
+            <ellipse class="orbit-segments" cx="320" cy="260" rx="160" ry="152" pathLength="100"/>
+            <g class="orbit-motion">
+              <ellipse class="orbit-flow" cx="320" cy="260" rx="160" ry="152" pathLength="100"/>
+              <ellipse class="orbit-flow orbit-flow-blue" cx="320" cy="260" rx="160" ry="152" pathLength="100"/>
+              <ellipse class="orbit-flow orbit-flow-teal" cx="320" cy="260" rx="160" ry="152" pathLength="100"/>
+            </g>
+          </svg>
+          <div class="product-core"><svg aria-hidden="true"><use href="#taskite-mark"/></svg><strong>Taskite<span>.</span></strong></div>
+          <div class="product-station pd-art"><div class="station-symbol"><svg aria-hidden="true"><use href="#network-pd"/></svg></div><div class="station-copy"><strong>PD</strong><span>集群协调</span></div></div>
+          <div class="product-station gateway-art"><div class="station-symbol"><svg aria-hidden="true"><use href="#network-gateway"/></svg></div><div class="station-copy"><strong>Gateway</strong><span>接入与路由</span></div></div>
+          <div class="product-station broker-art"><div class="station-symbol"><svg aria-hidden="true"><use href="#network-broker"/></svg></div><div class="station-copy"><strong>Broker</strong><span>保存与复制</span></div></div>
+          <div class="product-station worker-art"><div class="station-symbol"><svg aria-hidden="true"><use href="#network-worker"/></svg></div><div class="station-copy"><strong>Worker</strong><span>执行与上报</span></div></div>
+        </div>
+        <div class="art-bottomline"><span class="art-caption">状态被记录。任务向前走。</span><span class="art-caption">持久化 · 复制 · 执行</span></div>
+      </div>
+    </section>
+
+    <section id="reliability" class="section wrap">
+      <div class="section-intro reveal"><p class="eyebrow">RELIABILITY, AT THE CORE</p><h2>可靠，是架构的一部分。</h2><p>任务不止于被触发。它的状态、执行与恢复，<br class="desktop-break">都需要一条完整的路径。</p></div>
+      <div class="principles">
+        <article class="principle reveal"><div class="principle-graphic log-graphic" aria-hidden="true"><span><svg><use href="#task-record"/></svg></span><span><svg><use href="#task-record"/></svg></span><span><svg><use href="#task-record"/></svg></span></div><h3>每一步，都有据可循。</h3><p>命令与事件进入只追加的复制日志。任务状态持久保存，让恢复能够从已提交的记录继续。</p><span class="feature-tag">持久化状态 · 事件驱动</span></article>
+        <article class="principle reveal"><div class="principle-graphic replication-graphic" aria-hidden="true"><span>L</span><i></i><span>F</span><i></i><span>F</span></div><h3>一份任务，多份守护。</h3><p>每个 Broker 分区拥有独立的 Raft Group。日志由副本共同保存，Leader 故障后可重新选举。</p><span class="feature-tag">Multi-Raft · 副本一致性</span></article>
+        <article class="principle reveal"><div class="principle-graphic recovery-graphic" aria-hidden="true"><span>故障</span><i></i><span>恢复</span><i></i><b>继续</b></div><h3>故障之后，继续向前。</h3><p>快照与日志重放重建状态，Worker 注册租约与任务超时支持恢复处理，重试耗尽时由 Incident 保留问题。</p><span class="feature-tag">快照恢复 · 租约 · Incident</span></article>
+      </div>
+    </section>
+
+    <section id="architecture" class="architecture-section">
+      <div class="wrap">
+        <div class="architecture-intro reveal"><div><p class="eyebrow">DISTRIBUTED BY DESIGN</p><h2>分工明确。<br>协同，无处不在。</h2></div><p>接入、协调、存储与执行各司其职。<br>从一条任务的旅程，看见整个系统如何运转。</p></div>
+        <div class="architecture-demo reveal" id="architecture-demo" data-scenario="execution" data-step="0">
+          <div class="demo-toolbar"><div class="scenario-tabs" role="tablist" aria-label="架构演示场景"><button role="tab" aria-selected="true" aria-controls="architecture-panel" id="tab-execution" data-scenario="execution" tabindex="0">任务流转</button><button role="tab" aria-selected="false" aria-controls="architecture-panel" id="tab-failover" data-scenario="failover" tabindex="-1">故障恢复</button><button role="tab" aria-selected="false" aria-controls="architecture-panel" id="tab-scale" data-scenario="scale" tabindex="-1">水平扩展</button></div><span class="demo-label"><span class="demo-key"><i class="key-active" aria-hidden="true"></i>当前步骤</span><span class="demo-key"><i class="key-idle" aria-hidden="true"></i>常态</span><span class="demo-key"><i class="key-fault" aria-hidden="true"></i>故障</span></span></div>
+          <div id="architecture-panel" role="tabpanel" aria-labelledby="tab-execution">
+            <p class="architecture-scroll-hint">横向浏览完整架构 <span aria-hidden="true">↔</span></p>
+            <div class="topology-scroll" tabindex="0" role="region" aria-label="系统架构图，窄屏可横向滚动">
+              <div class="topology">
+                <div class="access-plane" aria-hidden="true"><span class="plane-label">入口与路由</span></div>
+                <svg class="topology-wires" viewBox="0 0 1200 720" preserveAspectRatio="none" aria-hidden="true">
+                  <g class="wire-base">
+                    <path data-link="client-gateway" d="M252 94H360" data-arrow-end/>
+                    <path data-link="gateway-broker" d="M1054 245V331" data-arrow-end/>
+                    <path data-link="gateway-pd" d="M768 245V290Q768 304 754 304H333Q319 304 319 318V331" data-arrow-start data-arrow-end/>
+                    <path data-link="worker-gateway" d="M252 202H360" data-arrow-end/>
+                    <path data-link="worker-pd" d="M138 245V331" data-arrow-end/>
+                    <path data-link="broker-pd" d="M540 475H420" data-arrow-end/>
+                    <path data-link="pd-broker" d="M420 583H540" data-arrow-end/>
+                    <path data-link="replication-1-1" d="M740 448H755" data-arrow-start data-arrow-end/>
+                    <path data-link="replication-1-2" d="M945 448H960" data-arrow-start data-arrow-end/>
+                    <path data-link="replication-2-1" d="M740 501H755" data-arrow-start data-arrow-end/>
+                    <path data-link="replication-2-2" d="M945 501H960" data-arrow-start data-arrow-end/>
+                    <path data-link="replication-3-1" d="M740 554H755" data-arrow-start data-arrow-end/>
+                    <path data-link="replication-3-2" d="M945 554H960" data-arrow-start data-arrow-end/>
+                  </g>
+                  <path class="wire wire-request" data-link="client-gateway" d="M252 94H360"/>
+                  <path class="wire wire-request" data-link="gateway-broker" d="M1054 245V331"/>
+                  <path class="wire wire-control" data-link="gateway-pd" d="M768 245V290Q768 304 754 304H333Q319 304 319 318V331"/>
+                  <path class="wire wire-control" data-link="broker-pd" d="M540 475H420"/>
+                  <path class="wire wire-control" data-link="pd-broker" d="M420 583H540"/>
+                  <path class="wire wire-worker" data-link="worker-gateway" d="M252 202H360"/>
+                  <path class="wire wire-worker" data-link="worker-pd" d="M138 245V331"/>
+                  <path class="wire wire-replication" data-link="replication" d="M740 448H755M945 448H960M740 501H755M945 501H960M740 554H755M945 554H960"/>
+                  <g class="topology-arrowheads"></g>
+                </svg>
+                <div class="client-node topology-node"><div><strong>Client</strong><small>任务与查询请求</small></div></div>
+                <div class="gateway-pool topology-node"><div class="node-head"><strong>Gateway 实例池</strong><span class="node-chip">无状态 · 可扩展</span></div><div class="gateway-instances"><span>Gateway 1</span><span>Gateway 2</span><span class="extra-gateway">Gateway 3</span><span class="gateway-more" aria-hidden="true">···</span><span>Gateway N</span></div><small>统一接入，按集群拓扑路由请求</small></div>
+                <span class="client-api-label">任务请求</span>
+                <span class="route-label">Leader 路由</span>
+                <span class="topology-sync">拓扑同步</span>
+                <span class="worker-api-label">任务激活 / 上报</span>
+                <span class="worker-registration-label">注册 / 续约</span>
+                <div class="control-plane topology-node"><div class="node-head"><div><span class="plane-label">控制面</span><strong>Placement Driver</strong></div><span class="group-badge">单 Raft Group</span></div><div class="pd-nodes"><span>PD 1<b>Leader</b></span><span>PD 2<b>Follower</b></span><span>PD 3<b>Follower</b></span></div><p>集群拓扑 · 注册租约<br>任务订阅 · 定时触发</p><div class="pd-state"><span>一致性协调</span><span>多副本保护</span></div></div>
+                <div class="data-plane" role="group" aria-label="Broker 集群：独立分区的 Multi-Raft 数据面"><div class="plane-heading"><div><span class="plane-label">数据面</span><strong>Broker 集群</strong></div><span class="group-badge">独立分区 · 多副本</span></div>
+                  <div class="broker-grid">
+                    <div class="broker topology-node" id="broker-1"><div class="broker-header"><strong>Broker 1</strong><span class="broker-health">在线</span></div><div class="partition leader" data-partition="1" data-broker="1"><span>P1</span><b>Leader</b></div><div class="partition" data-partition="2" data-broker="1"><span>P2</span><b>Follower</b></div><div class="partition" data-partition="3" data-broker="1"><span>P3</span><b>Follower</b></div><small>持久化任务状态</small></div>
+                    <div class="broker topology-node" id="broker-2"><div class="broker-header"><strong>Broker 2</strong><span class="broker-health">在线</span></div><div class="partition" data-partition="1" data-broker="2"><span>P1</span><b>Follower</b></div><div class="partition leader" data-partition="2" data-broker="2"><span>P2</span><b>Leader</b></div><div class="partition" data-partition="3" data-broker="2"><span>P3</span><b>Follower</b></div><small>持久化任务状态</small></div>
+                    <div class="broker topology-node" id="broker-3"><div class="broker-header"><strong>Broker 3</strong><span class="broker-health">在线</span></div><div class="partition" data-partition="1" data-broker="3"><span>P1</span><b>Follower</b></div><div class="partition" data-partition="2" data-broker="3"><span>P2</span><b>Follower</b></div><div class="partition leader" data-partition="3" data-broker="3"><span>P3</span><b>Leader</b></div><small>持久化任务状态</small></div>
+                  </div>
+                  <div class="scale-node" id="scale-node"><span>+ Broker 4</span><b>新节点待加入</b></div>
+                </div>
+                <div class="workers topology-node"><div><strong>Workers</strong><small>业务执行与状态上报</small></div></div>
+                <span class="broker-registration-label">注册与状态上报</span>
+                <span class="topology-change-label">拓扑与成员变更</span>
+              </div>
+            </div>
+            <div class="demo-narrative"><div aria-live="polite" aria-atomic="true"><span id="demo-counter" class="mono">01 / 04</span><h3 id="demo-title">从任何一个 Gateway 接入。</h3><p id="demo-description">Client 创建任务，Gateway 将请求路由到目标分区，让接入与任务处理各司其职。</p></div><div class="demo-controls"><button id="demo-prev" class="icon-button" aria-label="上一步" disabled>←</button><button id="demo-play" class="play-button" type="button"><span aria-hidden="true">▷</span><span>播放演示</span></button><button id="demo-next" class="icon-button" aria-label="下一步">→</button></div></div>
+            <div id="demo-steps" class="demo-steps" aria-label="演示步骤"></div>
+          </div>
+        </div>
+        <div class="architecture-notes"><p>每个分区独立选主，多副本共同保护任务状态。</p><a class="inline-link" href="https://github.com/taskite-io/taskite/blob/main/docs/network-ports.zh-CN.md">深入了解架构 <span aria-hidden="true">↗</span></a></div>
+        <div class="architecture-benefits"><div><span class="mono">ACCESS</span><h3>入口独立扩展</h3><p>Gateway 不保存会话状态，使用拓扑同步进行请求路由。</p></div><div><span class="mono">CONTROL</span><h3>协调保持一致</h3><p>PD 复制拓扑、注册与订阅，追踪变更计划和实时进度。</p></div><div><span class="mono">DATA</span><h3>负载分散到分区</h3><p>业务分区独立运行状态机，Broker 与 Worker 分散处理和执行负载。</p></div></div>
+      </div>
+    </section>
+
+    <section class="section lifecycle-section wrap" id="execution">
+      <div class="lifecycle-copy reveal"><p class="eyebrow">MORE THAN A TRIGGER</p><h2>从创建，到完成。<br><span class="muted-heading">每一步都算数。</span></h2><p>Taskite 保存任务的生命周期。Worker 负责业务执行，并明确上报完成或失败；引擎负责状态转换、超时与后续处理。</p><a class="inline-link" href="https://github.com/taskite-io/taskite/blob/main/gateway-protocol/src/main/resources/gateway.proto">查看任务协议 <span aria-hidden="true">↗</span></a></div>
+      <div class="lifecycle-card reveal">
+        <div class="lifecycle-top"><span class="mono">JOB LIFECYCLE</span><span class="task-type">payment</span></div>
+        <div class="lifecycle-track" aria-label="任务状态"><button class="lifecycle-step current" data-stage="0" aria-pressed="true"><span class="step-circle">1</span><span>创建</span></button><span class="track-line" aria-hidden="true"></span><button class="lifecycle-step" data-stage="1" aria-pressed="false"><span class="step-circle">2</span><span>就绪</span></button><span class="track-line" aria-hidden="true"></span><button class="lifecycle-step" data-stage="2" aria-pressed="false"><span class="step-circle">3</span><span>激活</span></button><span class="track-line" aria-hidden="true"></span><button class="lifecycle-step" data-stage="3" aria-pressed="false"><span class="step-circle">4</span><span>完成</span></button></div>
+        <div class="lifecycle-detail" aria-live="polite" aria-atomic="true"><div class="lifecycle-state mono" id="lifecycle-state">CREATE</div><h3 id="lifecycle-title">先让任务有一个持久的起点。</h3><p id="lifecycle-description">为任务类型与租户创建订阅，等待分发完成后创建任务。命令写入目标 Broker 分区。</p></div>
+        <div class="recovery-branch"><span class="branch-arrow" aria-hidden="true">↳</span><p><strong>执行失败或超时？</strong> 任务可重新进入处理路径；失败时明确设置剩余重试次数与退避，次数耗尽后创建 Incident。</p></div>
+        <button class="inline-link replay-button" id="lifecycle-play" type="button"><span aria-hidden="true">▷</span>播放任务旅程</button>
+      </div>
+    </section>
+
+    <section class="capabilities-section">
+      <div class="wrap">
+        <div class="section-intro reveal"><p class="eyebrow">ONE ENGINE. EVERY KIND OF TASK.</p><h2>此刻执行。或在下一刻。</h2><p>普通任务与定时任务，共享同一套持久化执行能力。</p></div>
+        <div class="capability-grid">
+          <article class="capability-card immediate-card reveal"><div class="capability-visual" aria-hidden="true"><div class="task-envelope"><svg class="task-glyph"><use href="#task-record"/></svg><span class="mono">CREATE JOB</span></div><span class="task-result"><span class="result-symbol"><svg><use href="#task-check"/></svg></span>交给合适的 Worker</span></div><div><p class="card-eyebrow">ON DEMAND</p><h3>业务发生，任务出发。</h3><p>通过 API 直接创建任务，携带变量、优先级和重试配置。Worker 按任务类型与租户激活任务。</p><div class="use-cases"><span>异步处理</span><span>数据同步</span><span>后台作业</span></div></div></article>
+          <article class="capability-card scheduled-card reveal"><div class="capability-visual schedule-visual" aria-hidden="true"><div class="schedule-ticks"><span>09:00</span><span>09:30</span><span>10:00</span><span>10:30</span></div><div class="schedule-line"><i></i><i></i><i></i><i></i></div><span class="mono schedule-expression">0 */30 * * * *</span></div><div><p class="card-eyebrow">RIGHT ON SCHEDULE</p><h3>一次，或下一次、再下一次。</h3><p>用 ISO8601 时长、周期表达式或六字段 cron 定义定时器。PD 保存调度计划、协调分发并负责定时触发。</p><div class="use-cases"><span>延迟执行</span><span>周期任务</span><span>定时报表</span></div></div></article>
+        </div>
+        <div class="tenant-note reveal"><span class="tenant-icon" aria-hidden="true">⊞</span><div><h3>不同业务，在同一引擎中有序运行。</h3><p>集群与租户上下文参与请求路由，任务订阅与 Worker 按任务类型和租户匹配。租户访问由 Gateway 鉴权策略约束。</p></div><span class="mono">MULTI-TENANT ROUTING</span></div>
+      </div>
+    </section>
+
+    <section id="observability" class="section observability-section wrap">
+      <div class="observability-art reveal" aria-label="可观测性示意，非实时监控数据">
+        <div class="observability-top"><span class="status-dot" aria-hidden="true"></span><strong>看见系统的每一个层次</strong><span class="mono">示意</span></div>
+        <div class="metric-row"><span>任务事件</span><div class="metric-bars" aria-hidden="true"><i style="--bar:35%"></i><i style="--bar:57%"></i><i style="--bar:44%"></i><i style="--bar:73%"></i><i style="--bar:59%"></i><i style="--bar:88%"></i><i style="--bar:72%"></i><i style="--bar:95%"></i><i style="--bar:79%"></i><i style="--bar:90%"></i><i style="--bar:69%"></i><i style="--bar:87%"></i></div><span class="metric-tag">生命周期</span></div>
+        <div class="metric-row"><span>复制与处理</span><svg class="metric-sparkline" viewBox="0 0 280 55" aria-hidden="true"><path d="M0 38 24 38 36 28 50 33 73 19 95 27 117 22 139 29 160 15 179 22 201 12 222 19 244 8 267 15 280 10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="metric-tag">引擎指标</span></div>
+        <div class="metric-row"><span>Incident</span><div class="incident-visual"><span class="incident-dot" aria-hidden="true">!</span><div><strong>失败可追踪，问题可处理</strong><small>查询 → 恢复重试次数 → 解决 Incident</small></div></div></div>
+        <div class="observability-bottom"><span>Prometheus</span><svg aria-hidden="true"><use href="#arrow"/></svg><span>Grafana</span><span class="mono">YOUR EXISTING WORKFLOW</span></div>
+      </div>
+      <div class="observability-copy reveal"><p class="eyebrow">OBSERVABLE, NOT OPAQUE</p><h2>可靠运行。<br>也要看得清楚。</h2><p>从任务事件到 Raft 处理，从快照到 JVM 资源，指标融入现有的 Prometheus 与 Grafana 体系。通过 Incident 定位需要介入的任务。</p><div class="observability-links"><a class="inline-link" href="https://github.com/taskite-io/taskite/tree/main/monitor/grafana">查看 Grafana 看板 <span aria-hidden="true">↗</span></a><a class="inline-link" href="https://github.com/taskite-io/taskite/blob/main/monitor/README.md">阅读指标说明 <span aria-hidden="true">↗</span></a></div></div>
+    </section>
+
+    <section id="developers" class="developer-section">
+      <div class="wrap developer-layout">
+        <div class="developer-copy reveal"><p class="eyebrow">BUILT FOR BUILDERS</p><h2>把可靠调度，<br>带进你的应用。</h2><p>结构化 Protocol Buffers 与 gRPC 接口，<br>Go SDK 与 tkctl，从代码到命令行接入。</p><a class="button primary" href="https://github.com/taskite-io/taskite">获取源代码<svg aria-hidden="true"><use href="#arrow"/></svg></a><div class="developer-requirements"><span>Java 21</span><span>Maven</span><span>Go SDK</span></div></div>
+        <div class="code-card reveal">
+          <div class="code-toolbar"><div role="tablist" aria-label="快速开始示例" class="code-tabs"><button id="code-tab-build" role="tab" aria-controls="code-build" aria-selected="true" data-code="build">构建</button><button id="code-tab-go" role="tab" aria-controls="code-go" aria-selected="false" data-code="go" tabindex="-1">Go SDK</button><button id="code-tab-cli" role="tab" aria-controls="code-cli" aria-selected="false" data-code="cli" tabindex="-1">tkctl</button></div><button id="copy-code" type="button" aria-label="复制当前代码示例">复制<span aria-hidden="true"> ⧉</span></button></div>
+          <div id="code-build" class="code-panel" role="tabpanel" aria-labelledby="code-tab-build"><div class="code-language mono">TERMINAL</div><pre tabindex="0"><code><span class="comment"># 获取并构建 Taskite</span>
+git clone https://github.com/taskite-io/taskite.git
+cd taskite
+mvn clean verify
+
+<span class="comment"># 使用仓库脚本配置本地集群</span>
+<span class="comment"># Placement Driver → Broker → Gateway</span>
+<span class="comment"># 完整启动与注册步骤见 scripts/</span></code></pre><p class="code-caption">服务端采用 Java 21。构建成功后，按角色配置并启动本地集群。</p></div>
+          <div id="code-go" class="code-panel" role="tabpanel" aria-labelledby="code-tab-go" hidden><div class="code-language mono">GO · 已配置并连接 client</div><pre tabindex="0"><code><span class="comment">// 先创建订阅，等待分发至 Broker 分区</span>
+_, err := client.NewCreateJobSubscriptionCommand().
+    JobType(<span class="string">"payment"</span>).Send(ctx)
+<span class="keyword">if</span> err != nil { log.Fatal(err) }
+
+<span class="comment">// 确认分发完成后，创建普通任务</span>
+job, err := client.NewCreateJobCommand().
+    JobType(<span class="string">"payment"</span>).
+    Variables(map[string]any{<span class="string">"orderId"</span>: 42}).
+    Send(ctx)
+<span class="keyword">if</span> err != nil { log.Fatal(err) }</code></pre><p class="code-caption">片段展示核心 API。client、ctx 与连接配置见完整 SDK 示例。</p></div>
+          <div id="code-cli" class="code-panel" role="tabpanel" aria-labelledby="code-tab-cli" hidden><div class="code-language mono">TERMINAL · 本地集群已运行</div><pre tabindex="0"><code>cd clients/go
+go build -o bin/tkctl ./cmd/tkctl
+export TASKITE_CLUSTER_ID=demo
+
+bin/tkctl create subscription payment
+<span class="comment"># 确认订阅已分发后创建任务</span>
+bin/tkctl create job payment --variables <span class="string">'{"orderId":42}'</span>
+bin/tkctl create timer payment --type duration --expression PT30S
+bin/tkctl activate jobs payment --handler cat</code></pre><p class="code-caption">默认连接本地 Gateway :26500 与 PD :26501。demo 集群需先注册。</p></div>
+          <div class="code-footer"><a href="https://github.com/taskite-io/taskite/blob/main/clients/go/README.md">完整 SDK 与 CLI 指南 <span aria-hidden="true">↗</span></a><a href="https://github.com/taskite-io/taskite/tree/main/scripts">本地集群脚本 <span aria-hidden="true">↗</span></a></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="closing-section wrap reveal"><svg class="closing-mark" aria-hidden="true"><use href="#taskite-mark"/></svg><p class="eyebrow">LET YOUR NEXT TASK GO FURTHER</p><h2>让任务，可靠地抵达。</h2><p>与 Taskite 一起，构建持续运转的系统。</p><div class="closing-actions"><a class="button primary" href="https://github.com/taskite-io/taskite"><svg aria-hidden="true"><use href="#github"/></svg>探索 Taskite<span aria-hidden="true">↗</span></a><a class="button secondary" href="https://github.com/taskite-io/taskite/issues">参与讨论<span aria-hidden="true">↗</span></a></div><p class="development-note">积极开发中 · 0.1.0-SNAPSHOT<br>首个稳定版本发布前，API 与存储兼容性仍可能演进。</p></section>
+  </main>
+
+  <footer class="site-footer wrap"><div class="footer-top"><a class="footer-name" href="#top"><svg aria-hidden="true"><use href="#taskite-mark"/></svg>Taskite<span>.</span></a><p>Distributed tasks. Reliable execution.</p><div><a href="https://github.com/taskite-io/taskite">GitHub ↗</a><a href="https://github.com/taskite-io/taskite/blob/main/CONTRIBUTING.md">贡献指南 ↗</a><a href="https://github.com/taskite-io/taskite/blob/main/COMMERCIAL-LICENSING.md">商业许可 ↗</a></div></div><div class="footer-bottom"><p>© <span id="year">2026</span> Taskite. <a href="https://github.com/taskite-io/taskite/blob/main/LICENSE">Taskite Community License 1.0</a></p><p>源码可用。非商业用途与有限商业评估适用社区许可；商业生产与托管服务需另行取得书面许可。</p></div></footer>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <noscript><p class="noscript-note">架构与产品内容可直接阅读。启用 JavaScript 后可操作架构演示和任务旅程。</p></noscript>
+</body>
+</html>
